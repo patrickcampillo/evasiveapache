@@ -4,8 +4,7 @@ FROM debian
 # set timezone so files' timestamps are correct
 ENV TZ=Europe/Madrid
 
-# install apache and php 7.3
-# we include procps and telnet so you can use these with shell.sh prompt
+# install apache and mod-evasive
 RUN apt-get update -y -qq >/dev/null \
     && apt-get install -y apache2 libapache2-mod-evasive >/dev/null \
     && apt-get purge --auto-remove \
@@ -15,9 +14,13 @@ RUN apt-get update -y -qq >/dev/null \
 
 # HTML server directory
 WORKDIR /var/www/html
+
+#COPY of the entrypoint file, and the evasive configuration file
 COPY entrypoint.sh /var/www/html/
 COPY evasive.conf /etc/apache2/mods-available/evasive.conf
 
+#RUN a restart of Apache
 RUN service apache2 restart
-# we run a script to stat the server; the array syntax makes it so ^C will work as we want
+
+#Entrypoint execution
 CMD  ["./entrypoint.sh"]
